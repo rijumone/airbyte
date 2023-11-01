@@ -220,7 +220,7 @@ public class DefaultTyperDeduper<DialectTableDefinition> implements TyperDeduper
           try {
             LOGGER.info("Attempting typing and deduping for {}.{}", originalNamespace, originalName);
             final String suffix = getFinalTableSuffix(streamConfig.id());
-            final String sql = sqlGenerator.updateTable(streamConfig, suffix, minExtractedAtByStream.get(streamConfig.id()));
+            final String sql = sqlGenerator.updateTable(streamConfig, suffix, minExtractedAtByStream.get(streamConfig.id()), true);
             destinationHandler.execute(sql);
           } finally {
             LOGGER.info("Allowing other threads to proceed for {}.{}", originalNamespace, originalName);
