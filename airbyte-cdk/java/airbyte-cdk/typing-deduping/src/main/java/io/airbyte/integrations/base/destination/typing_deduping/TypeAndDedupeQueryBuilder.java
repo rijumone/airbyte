@@ -87,7 +87,4 @@ public interface TypeAndDedupeQueryBuilder {
                        "COMMIT;"
     );
   }
-  }
-
-
 }

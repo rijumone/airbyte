@@ -4,9 +4,9 @@
 
 package io.airbyte.cdk.integrations.destination.jdbc;
 
+import static io.airbyte.cdk.integrations.base.JavaBaseConstants.DEFAULT_AIRBYTE_INTERNAL_NAMESPACE;
 import static io.airbyte.cdk.integrations.destination.jdbc.AbstractJdbcDestination.RAW_SCHEMA_OVERRIDE;
 import static io.airbyte.cdk.integrations.destination.jdbc.constants.GlobalDataSizeConstants.DEFAULT_MAX_BATCH_SIZE_BYTES;
-import static io.airbyte.integrations.base.destination.typing_deduping.CatalogParser.DEFAULT_RAW_TABLE_NAMESPACE;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Preconditions;
@@ -83,7 +83,7 @@ public class JdbcBufferedConsumerFactory {
         outputRecordCollector,
         onStartFunction(database, sqlOperations, writeConfigs, typerDeduper),
         new InMemoryRecordBufferingStrategy(recordWriterFunction(database, sqlOperations, writeConfigs, catalog), DEFAULT_MAX_BATCH_SIZE_BYTES),
-        onCloseFunction(),
+        onCloseFunction(typerDeduper),
         catalog,
         sqlOperations::isValidData,
         DestinationConfig.getInstance().getTextValue("schema")
@@ -118,15 +118,14 @@ public class JdbcBufferedConsumerFactory {
       final String tableName;
       final String tmpTableName;
       if (TypingAndDedupingFlag.isDestinationV2()) {
-        tableName = namingResolver.getRawTableName(streamName);
-        tmpTableName = namingResolver.getTmpTableName(streamName);
-      } else {
         final var finalSchema = Optional.ofNullable(abStream.getNamespace()).orElse(defaultSchemaName);
         final var rawName = StreamId.concatenateRawTableName(finalSchema, streamName);
         tableName = namingResolver.convertStreamName(rawName);
         tmpTableName = namingResolver.getTmpTableName(rawName);
+      } else {
+        tableName = namingResolver.getRawTableName(streamName);
+        tmpTableName = namingResolver.getTmpTableName(streamName);
       }
-
       final DestinationSyncMode syncMode = stream.getDestinationSyncMode();
 
       final WriteConfig writeConfig = new WriteConfig(streamName, abStream.getNamespace(), outputSchema, tmpTableName, tableName, syncMode);
@@ -147,7 +146,8 @@ public class JdbcBufferedConsumerFactory {
                                         final String defaultDestSchema,
                                         final NamingConventionTransformer namingResolver) {
     if (TypingAndDedupingFlag.isDestinationV2()) {
-      return namingResolver.getNamespace(TypingAndDedupingFlag.getRawNamespaceOverride(RAW_SCHEMA_OVERRIDE).orElse(DEFAULT_RAW_TABLE_NAMESPACE));
+      return namingResolver
+          .getNamespace(TypingAndDedupingFlag.getRawNamespaceOverride(RAW_SCHEMA_OVERRIDE).orElse(DEFAULT_AIRBYTE_INTERNAL_NAMESPACE));
     } else {
       return namingResolver.getNamespace(Optional.ofNullable(stream.getNamespace()).orElse(defaultDestSchema));
     }
@@ -230,10 +230,10 @@ public class JdbcBufferedConsumerFactory {
    * @return
    */
   private static OnCloseFunction onCloseFunction(final TyperDeduper typerDeduper) {
-
     return (hasFailed) -> {
       typerDeduper.typeAndDedupe();
       typerDeduper.commitFinalTables();
+      typerDeduper.cleanup();
     };
   }
 

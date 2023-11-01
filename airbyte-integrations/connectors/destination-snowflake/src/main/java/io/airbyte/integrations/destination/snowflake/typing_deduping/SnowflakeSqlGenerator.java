@@ -158,7 +158,7 @@ public class SnowflakeSqlGenerator implements SqlGenerator<SnowflakeTableDefinit
   }
 
   @Override
-  public String updateTable(final StreamConfig stream, final String finalSuffix, final Optional<Instant> minRawTimestamp) {
+  public String updateTable(final StreamConfig stream, final String finalSuffix, final Optional<Instant> minRawTimestamp, final boolean verifyPrimaryKeys) {
     final String handleNewRecordsRecords;
     if (stream.destinationSyncMode() == DestinationSyncMode.APPEND_DEDUP) {
       handleNewRecordsRecords = upsertNewRecords(stream, finalSuffix, minRawTimestamp);
@@ -586,12 +586,12 @@ public class SnowflakeSqlGenerator implements SqlGenerator<SnowflakeTableDefinit
   public String softReset(final StreamConfig stream) {
     final String createTempTable = createTable(stream, SOFT_RESET_SUFFIX.toUpperCase(), true);
     final String clearLoadedAt = clearLoadedAt(stream.id());
-    final String rebuildInTempTable = updateTable(stream, SOFT_RESET_SUFFIX.toUpperCase(), Optional.empty());
+    final String rebuildInTempTable = updateTable(stream, SOFT_RESET_SUFFIX.toUpperCase(), Optional.empty(), false);
     final String overwriteFinalTable = overwriteFinalTable(stream.id(), SOFT_RESET_SUFFIX.toUpperCase());
     return String.join("\n", createTempTable, clearLoadedAt, rebuildInTempTable, overwriteFinalTable);
   }
 
-  private String clearLoadedAt(final StreamId streamId) {
+  public String clearLoadedAt(final StreamId streamId) {
     return new StringSubstitutor(Map.of("raw_table_id", streamId.rawTableId(QUOTE)))
         .replace("""
                  UPDATE ${raw_table_id} SET "_airbyte_loaded_at" = NULL;

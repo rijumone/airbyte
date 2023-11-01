@@ -1,6 +1,12 @@
-package io.airbyte.integrations.destination.jdbc.typing_deduping;
+/*
+ * Copyright (c) 2023 Airbyte, Inc., all rights reserved.
+ */
 
-import io.airbyte.db.jdbc.JdbcDatabase;
+package io.airbyte.cdk.integrations.destination.jdbc.typing_deduping;
+
+import io.airbyte.cdk.db.jdbc.JdbcDatabase;
+import io.airbyte.cdk.integrations.destination.NamingConventionTransformer;
+import io.airbyte.cdk.integrations.destination.jdbc.SqlOperations;
 import io.airbyte.integrations.base.destination.typing_deduping.AirbyteProtocolType;
 import io.airbyte.integrations.base.destination.typing_deduping.AirbyteType;
 import io.airbyte.integrations.base.destination.typing_deduping.Array;
@@ -13,20 +19,20 @@ import io.airbyte.integrations.base.destination.typing_deduping.TableNotMigrated
 import io.airbyte.integrations.base.destination.typing_deduping.TypeAndDedupeQueryBuilder;
 import io.airbyte.integrations.base.destination.typing_deduping.Union;
 import io.airbyte.integrations.base.destination.typing_deduping.UnsupportedOneOf;
-import io.airbyte.integrations.destination.NamingConventionTransformer;
 import io.airbyte.integrations.destination.jdbc.CustomSqlType;
-import io.airbyte.integrations.destination.jdbc.SqlOperations;
 import io.airbyte.integrations.destination.jdbc.TypeInfoRecordSet;
 import java.sql.Connection;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.sql.SQLType;
 import java.sql.Statement;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import javax.sql.DataSource;
 import lombok.SneakyThrows;
 import org.apache.commons.text.StringSubstitutor;
@@ -47,7 +53,7 @@ public class JdbcSqlGenerator implements SqlGenerator<JdbcDatabase>, TypeAndDedu
   }
 
   @Override
-  public StreamId buildStreamId(String namespace, String name, String rawNamespaceOverride) {
+  public StreamId buildStreamId(final String namespace, final String name, final String rawNamespaceOverride) {
     return new StreamId(
         namingTransformer.getNamespace(namespace),
         namingTransformer.convertStreamName(name),
@@ -58,14 +64,13 @@ public class JdbcSqlGenerator implements SqlGenerator<JdbcDatabase>, TypeAndDedu
     );
   }
 
-  @Override
-  public ColumnId buildColumnId(String name) {
+  public ColumnId buildColumnId(final String name, final String suffix) {
     return null;
   }
 
-  private String columnsAndTypes(final Statement statement, StreamConfig stream, final SQLType structType) throws SQLException {
-    List<String> typeColumns = new ArrayList<>();
-    for (Entry<ColumnId, AirbyteType> entry : stream.columns().entrySet()) {
+  private String columnsAndTypes(final Statement statement, final StreamConfig stream, final SQLType structType) throws SQLException {
+    final List<String> typeColumns = new ArrayList<>();
+    for (final Entry<ColumnId, AirbyteType> entry : stream.columns().entrySet()) {
       typeColumns.add(
           String.join(" ", statement.enquoteIdentifier(entry.getKey().name(), false), toDialectType(entry.getValue(), structType).getName())
       );
@@ -96,7 +101,7 @@ public class JdbcSqlGenerator implements SqlGenerator<JdbcDatabase>, TypeAndDedu
     return bestType.isPresent() ? bestType.get() : fallback;
   }
 
-  protected SQLType toDialectType(final AirbyteType type, SQLType structType) {
+  protected SQLType toDialectType(final AirbyteType type, final SQLType structType) {
     if (type instanceof final AirbyteProtocolType airbyteProtocolType) {
       return toDialectType(airbyteProtocolType, structType);
     }
@@ -112,7 +117,7 @@ public class JdbcSqlGenerator implements SqlGenerator<JdbcDatabase>, TypeAndDedu
     }
   }
 
-  protected SQLType toDialectType(final AirbyteProtocolType airbyteProtocolType, SQLType structType) {
+  protected SQLType toDialectType(final AirbyteProtocolType airbyteProtocolType, final SQLType structType) {
     return switch (airbyteProtocolType) {
       case STRING -> JDBCType.VARCHAR;
       case NUMBER -> JDBCType.NUMERIC;
@@ -130,10 +135,10 @@ public class JdbcSqlGenerator implements SqlGenerator<JdbcDatabase>, TypeAndDedu
 
   @SneakyThrows
   @Override
-  public String createTable(StreamConfig stream, String suffix) {
-    Connection connection = dataSourceSupplier.getConnection();
-    Statement statement = connection.createStatement();
-    SQLType structType = preferredStructType(TypeInfoRecordSet.getTypeInfoList(connection.getMetaData()));
+  public String createTable(final StreamConfig stream, final String suffix, final boolean force) {
+    final Connection connection = dataSourceSupplier.getConnection();
+    final Statement statement = connection.createStatement();
+    final SQLType structType = preferredStructType(TypeInfoRecordSet.getTypeInfoList(connection.getMetaData()));
 
     final String columnDeclarations = columnsAndTypes(statement, stream, structType);
     return new StringSubstitutor(Map.of(
@@ -154,16 +159,18 @@ public class JdbcSqlGenerator implements SqlGenerator<JdbcDatabase>, TypeAndDedu
             """);
   }
 
+  @SneakyThrows
   @Override
-  public boolean existingSchemaMatchesStreamConfig(StreamConfig stream, JdbcDatabase existingTable) throws TableNotMigratedException {
-    existingTable.getMetaData().getColumns()
+  public boolean existingSchemaMatchesStreamConfig(final StreamConfig stream, final JdbcDatabase existingTable) throws TableNotMigratedException {
+    // existingTable.getMetaData().getColumns()
+    return false;
   }
 
   @SneakyThrows
   @Override
   public String clearLoadedAt(final StreamId streamId) {
-    Connection connection = dataSourceSupplier.getConnection();
-    Statement statement = connection.createStatement();
+    final Connection connection = dataSourceSupplier.getConnection();
+    final Statement statement = connection.createStatement();
     return new StringSubstitutor(Map.of("raw_table_id", statement.enquoteIdentifier(streamId.rawTableId(""), false)))
         .replace("""
                      UPDATE ${raw_table_id} SET _airbyte_loaded_at = NULL WHERE 1=1;
@@ -171,12 +178,12 @@ public class JdbcSqlGenerator implements SqlGenerator<JdbcDatabase>, TypeAndDedu
   }
 
   @Override
-  public String updateTable(StreamConfig stream, String finalSuffix, final boolean verifyPrimaryKeys) {
+  public String updateTable(final StreamConfig stream, final String finalSuffix, final Optional<Instant> minRawTimestamp, final boolean verifyPrimaryKeys) {
     return updateTableQuery(stream, finalSuffix, verifyPrimaryKeys);
   }
 
   @Override
-  public String overwriteFinalTable(StreamId stream, String finalSuffix) {
+  public String overwriteFinalTable(final StreamId stream, final String finalSuffix) {
     return null;
   }
 

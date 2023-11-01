@@ -374,7 +374,7 @@ public class BigQuerySqlGenerator implements SqlGenerator<TableDefinition> {
     final String clearLoadedAt = clearLoadedAt(stream.id());
     // We just unset loaded_at on all raw records, so we need to process all of them (i.e. should not
     // filter on extracted_at)
-    final String rebuildInTempTable = updateTable(stream, SOFT_RESET_SUFFIX, Optional.empty());
+    final String rebuildInTempTable = updateTable(stream, SOFT_RESET_SUFFIX, Optional.empty(), false);
     final String overwriteFinalTable = overwriteFinalTable(stream.id(), SOFT_RESET_SUFFIX);
     return String.join("\n", dropTempTable, createTempTable, clearLoadedAt, rebuildInTempTable, overwriteFinalTable);
   }
@@ -388,7 +388,7 @@ public class BigQuerySqlGenerator implements SqlGenerator<TableDefinition> {
                      """);
   }
 
-  private String clearLoadedAt(final StreamId streamId) {
+  public String clearLoadedAt(final StreamId streamId) {
     return new StringSubstitutor(Map.of(
         "project_id", '`' + projectId + '`',
         "raw_table_id", streamId.rawTableId(QUOTE)))
@@ -398,7 +398,7 @@ public class BigQuerySqlGenerator implements SqlGenerator<TableDefinition> {
   }
 
   @Override
-  public String updateTable(final StreamConfig stream, final String finalSuffix, final Optional<Instant> minRawTimestamp) {
+  public String updateTable(final StreamConfig stream, final String finalSuffix, final Optional<Instant> minRawTimestamp, final boolean verifyPrimaryKeys) {
     final var unsafeUpdate = updateTableQueryBuilder(stream, finalSuffix, false, minRawTimestamp);
     final var safeUpdate = updateTableQueryBuilder(stream, finalSuffix, true, minRawTimestamp);
     return new StringSubstitutor(Map.of("unsafe_update", unsafeUpdate, "safe_update", safeUpdate)).replace(

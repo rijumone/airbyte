@@ -75,7 +75,7 @@ public class SqlOperationsUtils {
           int i = 1;
           for (final AirbyteRecordMessage message : partition) {
             // Airbyte Raw ID
-            statement.setString(i++, uuidSupplier.get().toString());
+            statement.setString(i, uuidSupplier.get().toString());
             // Message Data
             statement.setString(i++, Jsons.serialize(message.getData()));
             // Extracted At
@@ -84,6 +84,7 @@ public class SqlOperationsUtils {
               // Loaded At
               statement.setTimestamp(i++, null);
             }
+            i++;
           }
 
           statement.execute();
