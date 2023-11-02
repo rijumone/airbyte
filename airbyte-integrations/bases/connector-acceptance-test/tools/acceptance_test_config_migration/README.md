@@ -21,9 +21,7 @@ touch migrations/<migration_name>/config.py
 Copy a config.py file from another migration and fill in the `MODULE_NAME` variable. The other variables
 can be filled in when you use certain scripts.
 ```python
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from typing import Optional, List
 

@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 import asyncclick as click
 from pipelines.airbyte_ci.metadata.pipeline import run_metadata_orchestrator_deploy_pipeline

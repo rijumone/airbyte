@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from airbyte_cdk.sources.file_based.exceptions import FileBasedSourceError
 from unit_tests.sources.file_based.scenarios.file_based_source_builder import FileBasedSourceBuilder

@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 import requests
 from airbyte_cdk.logger import AirbyteLogger

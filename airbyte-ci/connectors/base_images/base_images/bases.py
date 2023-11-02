@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 """This module declares common (abstract) classes and methods used by all base images."""
 from __future__ import annotations

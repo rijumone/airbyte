@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 import base64
 import hashlib
 from typing import Any, Optional

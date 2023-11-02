@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from airbyte_cdk.sources.file_based.config.jsonl_format import JsonlFormat
 from airbyte_cdk.sources.file_based.exceptions import FileBasedSourceError

@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from samples.test_data_for_analytics import test_input_record, test_output_slices
 from source_linkedin_ads.analytics import make_analytics_slices

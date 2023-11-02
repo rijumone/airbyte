@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 """This module declare base / abstract models to be reused in a pipeline lifecycle."""
 

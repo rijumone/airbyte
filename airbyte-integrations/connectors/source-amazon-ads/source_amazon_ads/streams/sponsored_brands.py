@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from source_amazon_ads.schemas import BrandsAdGroup, BrandsCampaign
 from source_amazon_ads.streams.common import SubProfilesStream

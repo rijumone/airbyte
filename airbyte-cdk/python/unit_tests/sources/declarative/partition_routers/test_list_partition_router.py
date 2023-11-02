@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 import pytest as pytest
 from airbyte_cdk.sources.declarative.partition_routers.list_partition_router import ListPartitionRouter

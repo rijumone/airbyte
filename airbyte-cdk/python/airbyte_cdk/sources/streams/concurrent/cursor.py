@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 import functools
 from abc import ABC, abstractmethod
 from typing import Any, List, Mapping, Optional, Protocol, Tuple

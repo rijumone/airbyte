@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from dagger import Client, Container, Directory, Secret
 from pipelines.helpers.github import AIRBYTE_GITHUB_REPO

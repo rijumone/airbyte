@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from pipelines.dagger.actions.python.poetry import with_poetry_module
 from pipelines.models.contexts.pipeline_context import PipelineContext

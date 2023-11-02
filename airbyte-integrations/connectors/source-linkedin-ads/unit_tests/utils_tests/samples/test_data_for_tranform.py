@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 """ This is the example of input record for the test_tranform_data. """
 input_test_data = [

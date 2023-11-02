@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 """This modules groups functions made to download/upload secrets from/to a remote secret service and provide these secret in a dagger Directory."""
 from __future__ import annotations

@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 import requests
 from airbyte_cdk.sources.declarative.requesters.paginators.no_pagination import NoPagination

@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 from .asserts import verify_records_schema
 from .common import (
     SecretDict,

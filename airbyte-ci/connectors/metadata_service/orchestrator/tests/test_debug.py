@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from dagster import build_op_context
 from metadata_service.constants import METADATA_FILE_NAME, METADATA_FOLDER

@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 # Note: cattrs is pinned to the last known working version which does not have conflicts with typing_extensions.  Learn more https://airbytehq-team.slack.com/archives/C03C4AVJWG4/p1685546430990049
 

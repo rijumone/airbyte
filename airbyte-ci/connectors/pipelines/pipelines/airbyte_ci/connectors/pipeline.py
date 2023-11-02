@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 """This module groups the functions to run full pipelines for connector testing."""
 

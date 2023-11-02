@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from airbyte_cdk.sources.declarative.partition_routers.single_partition_router import SinglePartitionRouter
 

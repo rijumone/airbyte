@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 DEFAULT_FORMAT_IGNORE_LIST = [
     "**/__pycache__",

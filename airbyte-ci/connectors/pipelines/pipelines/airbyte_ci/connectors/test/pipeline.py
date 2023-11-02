@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 """This module groups factory like functions to dispatch tests steps according to the connector under test language."""
 
 import itertools

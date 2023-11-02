@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from decimal import Decimal
 from typing import Any, Dict, List, Optional

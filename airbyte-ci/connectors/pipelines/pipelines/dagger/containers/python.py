@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from dagger import CacheSharingMode, CacheVolume, Client, Container
 from pipelines.airbyte_ci.connectors.context import PipelineContext

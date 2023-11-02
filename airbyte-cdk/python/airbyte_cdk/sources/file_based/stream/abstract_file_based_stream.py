@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from abc import abstractmethod
 from functools import cache, cached_property, lru_cache

@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from source_linkedin_ads.analytics import chunk_analytics_fields
 

@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 """This module groups steps made to run tests for a specific Java connector given a test context."""
 

@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from airbyte_cdk.sources.declarative.schema.default_schema_loader import DefaultSchemaLoader
 from airbyte_cdk.sources.declarative.schema.inline_schema_loader import InlineSchemaLoader

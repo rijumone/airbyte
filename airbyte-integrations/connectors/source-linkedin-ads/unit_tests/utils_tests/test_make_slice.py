@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 import pytest
 from source_linkedin_ads.utils import get_parent_stream_values

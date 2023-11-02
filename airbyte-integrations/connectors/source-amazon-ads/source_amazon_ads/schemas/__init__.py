@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 from .attribution_report import AttributionReportModel
 from .common import CatalogModel, Keywords, MetricsReport, NegativeKeywords, Portfolio
 from .profile import Profile

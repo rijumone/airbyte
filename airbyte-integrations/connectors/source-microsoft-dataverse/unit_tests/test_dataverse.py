@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 import pytest
 from source_microsoft_dataverse.dataverse import AirbyteType, convert_dataverse_type

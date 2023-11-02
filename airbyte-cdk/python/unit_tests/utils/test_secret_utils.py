@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 import pytest
 from airbyte_cdk.utils.airbyte_secrets_utils import filter_secrets, get_secret_paths, get_secrets, update_secrets

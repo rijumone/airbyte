@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 
 # RecordTransformation is depended upon by every class in this module (since it's the abc everything implements). For this reason,

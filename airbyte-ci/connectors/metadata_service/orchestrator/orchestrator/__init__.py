@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 from dagster import Definitions, EnvVar, ScheduleDefinition, load_assets_from_modules
 from dagster_slack import SlackResource
 from metadata_service.constants import METADATA_FILE_NAME, METADATA_FOLDER

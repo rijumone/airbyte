@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from __future__ import (  # Used to evaluate type hints at runtime, a NameError: name 'RemoteSecret' is not defined is thrown otherwise
     annotations,

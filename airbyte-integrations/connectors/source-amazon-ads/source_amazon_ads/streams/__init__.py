@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 from .attribution_report import (
     AttributionReportPerformanceAdgroup,
     AttributionReportPerformanceCampaign,

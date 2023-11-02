@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 
 from destination_google_sheets.client import GoogleSheetsClient

@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 
 # NETSUITE ERROR CODES BY THEIR HTTP TWINS

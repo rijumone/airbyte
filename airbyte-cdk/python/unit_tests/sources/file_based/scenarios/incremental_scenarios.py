@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from unit_tests.sources.file_based.helpers import LowHistoryLimitCursor
 from unit_tests.sources.file_based.scenarios.file_based_source_builder import FileBasedSourceBuilder

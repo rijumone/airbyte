@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from urllib.parse import parse_qsl, urlparse, urlunparse
 

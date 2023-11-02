@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 """This module is the CLI entrypoint to the airbyte-ci commands."""
 

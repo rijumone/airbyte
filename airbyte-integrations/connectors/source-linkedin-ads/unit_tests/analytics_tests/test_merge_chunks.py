@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from samples.test_data_for_analytics import test_input_result_record_chunks, test_output_merged_chunks
 from source_linkedin_ads.analytics import merge_chunks

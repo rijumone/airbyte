@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 import responses
 from source_my_hours.auth import MyHoursAuthenticator

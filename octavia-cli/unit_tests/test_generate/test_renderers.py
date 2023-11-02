@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from pathlib import Path
 from unittest.mock import mock_open, patch

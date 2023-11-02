@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 from itertools import product
 from typing import Any, List, Mapping, Tuple
 

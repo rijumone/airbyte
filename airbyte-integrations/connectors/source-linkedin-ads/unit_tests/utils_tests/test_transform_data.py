@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from samples.test_data_for_tranform import input_test_data, output_test_data
 from source_linkedin_ads.utils import transform_data

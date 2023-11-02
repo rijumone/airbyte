@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 # This file contains the longest unit tests. This spawns a local fauna container and
 # tests against that. These tests are used to make sure we don't skip documents on

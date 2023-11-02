@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 
 def convert_custom_reports_fields_to_list(custom_reports_fields: str) -> list:

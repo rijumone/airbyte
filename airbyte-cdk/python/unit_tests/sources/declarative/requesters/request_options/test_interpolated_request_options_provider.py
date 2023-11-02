@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 import pytest
 from airbyte_cdk.sources.declarative.requesters.request_options.interpolated_request_options_provider import (

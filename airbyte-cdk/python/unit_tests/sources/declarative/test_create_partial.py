@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 import pytest
 from airbyte_cdk.sources.declarative.create_partial import _key_is_unset_or_identical, create

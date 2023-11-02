@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from source_amazon_seller_partner.auth import AWSSignature
 from source_amazon_seller_partner.streams import SellerAnalyticsSalesAndTrafficReports

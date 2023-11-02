@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from airbyte_cdk.sources.declarative.transformations.add_fields import AddedFieldDefinition
 from source_braze import TransformToRecordComponent

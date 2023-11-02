@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 
 def filter_streams_by_criteria(streams_list: list, search_word: str, search_criteria: str):

@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 import pytest
 from airbyte_cdk.sources.declarative.auth.token import LegacySessionTokenAuthenticator, get_new_session_token

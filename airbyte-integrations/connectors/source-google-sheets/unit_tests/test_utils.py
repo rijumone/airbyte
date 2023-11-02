@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 import pytest
 from source_google_sheets.utils import exception_description_by_status_code, name_conversion, safe_name_conversion

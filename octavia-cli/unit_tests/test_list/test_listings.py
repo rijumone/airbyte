@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 import pytest
 from airbyte_api_client.api import connection_api, destination_api, destination_definition_api, source_api, source_definition_api

@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from airbyte_cdk.models import AirbyteAnalyticsTraceMessage
 from airbyte_cdk.sources.file_based.config.csv_format import CsvFormat

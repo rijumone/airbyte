@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 """This module contains hacks used in connectors pipelines. They're gathered here for tech debt visibility."""
 

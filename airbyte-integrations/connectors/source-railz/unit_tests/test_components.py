@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from freezegun import freeze_time
 from source_railz.components import ShortLivedTokenAuthenticator

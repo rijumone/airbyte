@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 from dataclasses import InitVar, dataclass
 from datetime import datetime, timedelta

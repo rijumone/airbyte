@@ -1,6 +1,4 @@
-#
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
-#
 
 """
 Test case, when custom Export, ExportSchema properties contains names,
