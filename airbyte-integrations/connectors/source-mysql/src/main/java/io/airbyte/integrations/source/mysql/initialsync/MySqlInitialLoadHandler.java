@@ -49,7 +49,7 @@ public class MySqlInitialLoadHandler {
   private static final long RECORD_LOGGING_SAMPLE_RATE = 1_000_000;
   private final JsonNode config;
   private final JdbcDatabase database;
-  private final JdbcCompatibleSourceOperations sourceOperations;
+  private final MySqlSourceOperations sourceOperations;
   private final String quoteString;
   private final MySqlInitialLoadStateManager initialLoadStateManager;
   private final Function<AirbyteStreamNameNamespacePair, JsonNode> streamStateForIncrementalRunSupplier;
