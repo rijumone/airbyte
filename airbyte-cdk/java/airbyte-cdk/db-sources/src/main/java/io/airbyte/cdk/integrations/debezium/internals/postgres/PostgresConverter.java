@@ -240,8 +240,8 @@ public class PostgresConverter implements CustomConverter<SchemaBuilder, Relatio
     return field.scale().orElse(-1);
   }
 
-  private final String PLUS_INFINITY_VALUE = "+infinity";
-  private final String MINUS_INFINITY_VALUE = "-infinity";
+  private final String POSITIVE_INFINITY_VALUE = "+infinity";
+  private final String NEGATIVE_INFINITY_VALUE = "-infinity";
 
   // Ref :
   // https://debezium.io/documentation/reference/2.2/connectors/postgresql.html#postgresql-temporal-types
@@ -256,18 +256,18 @@ public class PostgresConverter implements CustomConverter<SchemaBuilder, Relatio
           return DateTimeConverter.convertToTimeWithTimezone(x);
         case "TIMESTAMPTZ":
           if (x.equals(PostgresValueConverter.NEGATIVE_INFINITY_OFFSET_DATE_TIME)) {
-            return MINUS_INFINITY_VALUE;
+            return NEGATIVE_INFINITY_VALUE;
           }
           if (x.equals(PostgresValueConverter.POSITIVE_INFINITY_OFFSET_DATE_TIME)) {
-            return PLUS_INFINITY_VALUE;
+            return POSITIVE_INFINITY_VALUE;
           }
           return DateTimeConverter.convertToTimestampWithTimezone(x);
         case "TIMESTAMP":
           if (x.equals(PostgresValueConverter.NEGATIVE_INFINITY_INSTANT)) {
-            return MINUS_INFINITY_VALUE;
+            return NEGATIVE_INFINITY_VALUE;
           }
           if (x.equals(PostgresValueConverter.POSITIVE_INFINITY_INSTANT)) {
-            return PLUS_INFINITY_VALUE;
+            return POSITIVE_INFINITY_VALUE;
           }
           if (x instanceof final Long l) {
             if (getTimePrecision(field) <= 3) {
@@ -280,10 +280,10 @@ public class PostgresConverter implements CustomConverter<SchemaBuilder, Relatio
           return convertToTimestamp(x);
         case "DATE":
           if (x.equals(PostgresValueConverter.NEGATIVE_INFINITY_LOCAL_DATE)) {
-            return MINUS_INFINITY_VALUE;
+            return NEGATIVE_INFINITY_VALUE;
           }
           if (x.equals(PostgresValueConverter.POSITIVE_INFINITY_LOCAL_DATE)) {
-            return PLUS_INFINITY_VALUE;
+            return POSITIVE_INFINITY_VALUE;
           }
           if (x instanceof Integer) {
             return convertToDate(LocalDate.ofEpochDay((Integer) x));
