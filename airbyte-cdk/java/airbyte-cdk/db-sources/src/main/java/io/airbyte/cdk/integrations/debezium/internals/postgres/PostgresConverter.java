@@ -15,6 +15,7 @@ import static org.apache.kafka.connect.data.Schema.OPTIONAL_STRING_SCHEMA;
 
 import io.airbyte.cdk.db.jdbc.DateTimeConverter;
 import io.airbyte.cdk.integrations.debezium.internals.DebeziumConverterUtils;
+import io.debezium.connector.postgresql.PostgresValueConverter;
 import io.debezium.spi.converter.CustomConverter;
 import io.debezium.spi.converter.RelationalColumn;
 import io.debezium.time.Conversions;
@@ -242,99 +243,62 @@ public class PostgresConverter implements CustomConverter<SchemaBuilder, Relatio
     return field.scale().orElse(-1);
   }
 
-  private final String PLUS_INFINITY_VALUE = "+Infinity";
-  private final String MINUS_INFINITY_VALUE = "-Infinity";
+  private final String PLUS_INFINITY_VALUE = "+infinity";
+  private final String MINUS_INFINITY_VALUE = "-infinity";
 
   // Ref :
   // https://debezium.io/documentation/reference/2.2/connectors/postgresql.html#postgresql-temporal-types
-  private static final long MS_IN_DAY=24L*60*60*1000;
-  private static final long MS_IN_SECOND=1000L;
   private void registerDate(final RelationalColumn field, final ConverterRegistration<SchemaBuilder> registration) {
     final var fieldType = field.typeName();
-    LOGGER.warn("SGX field=" + field);
-    LOGGER.warn("SGX registration=" + registration);
     registration.register(SchemaBuilder.string().optional(), x -> {
       if (x == null) {
         return DebeziumConverterUtils.convertDefaultValue(field);
       }
-      LOGGER.warn("SGX x=" + x);
-      LOGGER.warn("SGX xType=" + x.getClass().getCanonicalName());
-      LOGGER.warn("SGX fieldType=" + fieldType);
-      if (x instanceof Instant) {
-        LOGGER.warn("SGX instant.getEpochSeconds=" + ((Instant) x).getEpochSecond() + ", instant.getNano=" + ((Instant) x).getNano() + ", instant.toEpochMilli=" + ((Instant) x).toEpochMilli());
-      }
-      if (x instanceof LocalDate) {
-        LOGGER.warn("SGX localDate.toEpochDay=" + ((LocalDate) x).toEpochDay());
-      }
-      if (x instanceof OffsetDateTime) {
-        LOGGER.warn("SGX offsetDateTime.getEpochSeconds=" + ((OffsetDateTime) x).toEpochSecond() + ", offsetDateTime.getNano=" + ((OffsetDateTime) x).getNano());
-      }
-      String retVal;
       switch (fieldType.toUpperCase(Locale.ROOT)) {
         case "TIMETZ":
-          retVal = DateTimeConverter.convertToTimeWithTimezone(x);
-          break;
+          return DateTimeConverter.convertToTimeWithTimezone(x);
         case "TIMESTAMPTZ":
-          if (x instanceof final OffsetDateTime t && t.getNano() == 0) {
-            if (t.toEpochSecond()*MS_IN_SECOND == PGStatement.DATE_NEGATIVE_INFINITY) {
-              return MINUS_INFINITY_VALUE;
-            }
-            if (t.toEpochSecond()*MS_IN_SECOND == PGStatement.DATE_POSITIVE_INFINITY) {
-              return PLUS_INFINITY_VALUE;
-            }
+          if (x.equals(PostgresValueConverter.NEGATIVE_INFINITY_OFFSET_DATE_TIME)) {
+            return MINUS_INFINITY_VALUE;
           }
-          retVal = DateTimeConverter.convertToTimestampWithTimezone(x);
-          break;
+          if (x.equals(PostgresValueConverter.POSITIVE_INFINITY_OFFSET_DATE_TIME)) {
+            return PLUS_INFINITY_VALUE;
+          }
+          return DateTimeConverter.convertToTimestampWithTimezone(x);
         case "TIMESTAMP":
-          if (x instanceof final Instant t && t.getNano() == 0) {
-            if (t.getEpochSecond()*MS_IN_SECOND == PGStatement.DATE_NEGATIVE_INFINITY) {
-              return MINUS_INFINITY_VALUE;
-            }
-            if (t.getEpochSecond()*MS_IN_SECOND == PGStatement.DATE_POSITIVE_INFINITY) {
-              return PLUS_INFINITY_VALUE;
-            }
+          if (x.equals(PostgresValueConverter.NEGATIVE_INFINITY_INSTANT)) {
+            return MINUS_INFINITY_VALUE;
+          }
+          if (x.equals(PostgresValueConverter.POSITIVE_INFINITY_INSTANT)) {
+            return PLUS_INFINITY_VALUE;
           }
           if (x instanceof final Long l) {
             if (getTimePrecision(field) <= 3) {
-              retVal = convertToTimestamp(Conversions.toInstantFromMillis(l));
-              break;
+              return convertToTimestamp(Conversions.toInstantFromMillis(l));
             }
             if (getTimePrecision(field) <= 6) {
-              retVal = convertToTimestamp(Conversions.toInstantFromMicros(l));
-              break;
+              return convertToTimestamp(Conversions.toInstantFromMicros(l));
             }
           }
-          retVal = convertToTimestamp(x);
-          break;
+          return convertToTimestamp(x);
         case "DATE":
-          if (x instanceof final LocalDate t) {
-            LOGGER.warn("SGX t.toEpochDay=" + t.toEpochDay()*MS_IN_DAY + ", *MS_IN_DAY=" + t.toEpochDay()*MS_IN_DAY);
-            LOGGER.warn("SGX DATE_NEGATIVE_SMALLER_INFINITY=" + PGStatement.DATE_NEGATIVE_SMALLER_INFINITY);
-            LOGGER.warn("SGX DATE_NEGATIVE_SMALLER_INFINITY=" + PGStatement.DATE_NEGATIVE_SMALLER_INFINITY);
-            if (t.toEpochDay()*MS_IN_DAY == PGStatement.DATE_NEGATIVE_SMALLER_INFINITY) {
-              return MINUS_INFINITY_VALUE;
-            }
-            if (t.toEpochDay()*MS_IN_DAY == PGStatement.DATE_POSITIVE_SMALLER_INFINITY) {
-              return PLUS_INFINITY_VALUE;
-            }
+          if (x.equals(PostgresValueConverter.NEGATIVE_INFINITY_LOCAL_DATE)) {
+            return MINUS_INFINITY_VALUE;
+          }
+          if (x.equals(PostgresValueConverter.POSITIVE_INFINITY_LOCAL_DATE)) {
+            return PLUS_INFINITY_VALUE;
           }
           if (x instanceof Integer) {
-            retVal = convertToDate(LocalDate.ofEpochDay((Integer) x));
-            break;
+            return convertToDate(LocalDate.ofEpochDay((Integer) x));
           }
-          retVal = convertToDate(x);
-          break;
+          return convertToDate(x);
         case "TIME":
-          retVal = resolveTime(field, x);
-          break;
+          return resolveTime(field, x);
         case "INTERVAL":
-          retVal = convertInterval((PGInterval) x);
-          break;
+          return convertInterval((PGInterval) x);
         default:
           throw new IllegalArgumentException("Unknown field type  " + fieldType.toUpperCase(Locale.ROOT));
       }
-      LOGGER.warn("SGX retVal=" + retVal);
-      return retVal;
     });
   }
 
