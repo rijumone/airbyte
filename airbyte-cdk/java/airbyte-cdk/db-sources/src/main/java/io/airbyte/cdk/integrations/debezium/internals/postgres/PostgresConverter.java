@@ -17,22 +17,28 @@ import io.airbyte.cdk.db.jdbc.DateTimeConverter;
 import io.airbyte.cdk.integrations.debezium.internals.DebeziumConverterUtils;
 import io.debezium.spi.converter.CustomConverter;
 import io.debezium.spi.converter.RelationalColumn;
+import io.debezium.time.Conversions;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.kafka.connect.data.SchemaBuilder;
+import org.postgresql.PGStatement;
 import org.postgresql.jdbc.PgArray;
 import org.postgresql.util.PGInterval;
 import org.slf4j.Logger;
@@ -236,25 +242,99 @@ public class PostgresConverter implements CustomConverter<SchemaBuilder, Relatio
     return field.scale().orElse(-1);
   }
 
+  private final String PLUS_INFINITY_VALUE = "+Infinity";
+  private final String MINUS_INFINITY_VALUE = "-Infinity";
+
   // Ref :
   // https://debezium.io/documentation/reference/2.2/connectors/postgresql.html#postgresql-temporal-types
+  private static final long MS_IN_DAY=24L*60*60*1000;
+  private static final long MS_IN_SECOND=1000L;
   private void registerDate(final RelationalColumn field, final ConverterRegistration<SchemaBuilder> registration) {
     final var fieldType = field.typeName();
-
+    LOGGER.warn("SGX field=" + field);
+    LOGGER.warn("SGX registration=" + registration);
     registration.register(SchemaBuilder.string().optional(), x -> {
-      throw new RuntimeException();/*
-                                    * if (x == null) { return DebeziumConverterUtils.convertDefaultValue(field); } switch
-                                    * (fieldType.toUpperCase(Locale.ROOT)) { case "TIMETZ": return
-                                    * DateTimeConverter.convertToTimeWithTimezone(x); case "TIMESTAMPTZ": return
-                                    * DateTimeConverter.convertToTimestampWithTimezone(x); case "TIMESTAMP": if (x instanceof final
-                                    * Long l) { if (getTimePrecision(field) <= 3) { return
-                                    * convertToTimestamp(Conversions.toInstantFromMillis(l)); } if (getTimePrecision(field) <= 6) {
-                                    * return convertToTimestamp(Conversions.toInstantFromMicros(l)); } } return convertToTimestamp(x);
-                                    * case "DATE": if (x instanceof Integer) { return convertToDate(LocalDate.ofEpochDay((Integer) x));
-                                    * } return convertToDate(x); case "TIME": return resolveTime(field, x); case "INTERVAL": return
-                                    * convertInterval((PGInterval) x); default: throw new
-                                    * IllegalArgumentException("Unknown field type  " + fieldType.toUpperCase(Locale.ROOT)); }
-                                    */
+      if (x == null) {
+        return DebeziumConverterUtils.convertDefaultValue(field);
+      }
+      LOGGER.warn("SGX x=" + x);
+      LOGGER.warn("SGX xType=" + x.getClass().getCanonicalName());
+      LOGGER.warn("SGX fieldType=" + fieldType);
+      if (x instanceof Instant) {
+        LOGGER.warn("SGX instant.getEpochSeconds=" + ((Instant) x).getEpochSecond() + ", instant.getNano=" + ((Instant) x).getNano() + ", instant.toEpochMilli=" + ((Instant) x).toEpochMilli());
+      }
+      if (x instanceof LocalDate) {
+        LOGGER.warn("SGX localDate.toEpochDay=" + ((LocalDate) x).toEpochDay());
+      }
+      if (x instanceof OffsetDateTime) {
+        LOGGER.warn("SGX offsetDateTime.getEpochSeconds=" + ((OffsetDateTime) x).toEpochSecond() + ", offsetDateTime.getNano=" + ((OffsetDateTime) x).getNano());
+      }
+      String retVal;
+      switch (fieldType.toUpperCase(Locale.ROOT)) {
+        case "TIMETZ":
+          retVal = DateTimeConverter.convertToTimeWithTimezone(x);
+          break;
+        case "TIMESTAMPTZ":
+          if (x instanceof final OffsetDateTime t && t.getNano() == 0) {
+            if (t.toEpochSecond()*MS_IN_SECOND == PGStatement.DATE_NEGATIVE_INFINITY) {
+              return MINUS_INFINITY_VALUE;
+            }
+            if (t.toEpochSecond()*MS_IN_SECOND == PGStatement.DATE_POSITIVE_INFINITY) {
+              return PLUS_INFINITY_VALUE;
+            }
+          }
+          retVal = DateTimeConverter.convertToTimestampWithTimezone(x);
+          break;
+        case "TIMESTAMP":
+          if (x instanceof final Instant t && t.getNano() == 0) {
+            if (t.getEpochSecond()*MS_IN_SECOND == PGStatement.DATE_NEGATIVE_INFINITY) {
+              return MINUS_INFINITY_VALUE;
+            }
+            if (t.getEpochSecond()*MS_IN_SECOND == PGStatement.DATE_POSITIVE_INFINITY) {
+              return PLUS_INFINITY_VALUE;
+            }
+          }
+          if (x instanceof final Long l) {
+            if (getTimePrecision(field) <= 3) {
+              retVal = convertToTimestamp(Conversions.toInstantFromMillis(l));
+              break;
+            }
+            if (getTimePrecision(field) <= 6) {
+              retVal = convertToTimestamp(Conversions.toInstantFromMicros(l));
+              break;
+            }
+          }
+          retVal = convertToTimestamp(x);
+          break;
+        case "DATE":
+          if (x instanceof final LocalDate t) {
+            LOGGER.warn("SGX t.toEpochDay=" + t.toEpochDay()*MS_IN_DAY + ", *MS_IN_DAY=" + t.toEpochDay()*MS_IN_DAY);
+            LOGGER.warn("SGX DATE_NEGATIVE_SMALLER_INFINITY=" + PGStatement.DATE_NEGATIVE_SMALLER_INFINITY);
+            LOGGER.warn("SGX DATE_NEGATIVE_SMALLER_INFINITY=" + PGStatement.DATE_NEGATIVE_SMALLER_INFINITY);
+            if (t.toEpochDay()*MS_IN_DAY == PGStatement.DATE_NEGATIVE_SMALLER_INFINITY) {
+              return MINUS_INFINITY_VALUE;
+            }
+            if (t.toEpochDay()*MS_IN_DAY == PGStatement.DATE_POSITIVE_SMALLER_INFINITY) {
+              return PLUS_INFINITY_VALUE;
+            }
+          }
+          if (x instanceof Integer) {
+            retVal = convertToDate(LocalDate.ofEpochDay((Integer) x));
+            break;
+          }
+          retVal = convertToDate(x);
+          break;
+        case "TIME":
+          retVal = resolveTime(field, x);
+          break;
+        case "INTERVAL":
+          retVal = convertInterval((PGInterval) x);
+          break;
+        default:
+          throw new IllegalArgumentException("Unknown field type  " + fieldType.toUpperCase(Locale.ROOT));
+      }
+      LOGGER.warn("SGX retVal=" + retVal);
+      return retVal;
     });
   }
 
